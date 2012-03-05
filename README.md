@@ -1,6 +1,6 @@
 # requests-oauth2
 
-This plugins adds OAuth v2.0 support to @kennethreitz well-known requests library.
+This plugins adds OAuth v2.0 support to <a href="http://github.com/kennethreitz">@kennethreitz</a> well-known <a href="http://github.com/kennethreitz/requests">requests</a> library.
 
 requests-oauth2 wants to provide the simplest and easiest way to do OAuth2 in Python. OAuth2 is several orders of magnitude easier to do than old OAuth1.0, so this is basically a simple connection initialization library. If you are looking for a way of doing OAuth 1.0 see <a href="http://github.com/maraujop/requests-oauth">requests-oauth</a>
 
@@ -22,11 +22,11 @@ Get the url to redirect the user to for consenting OAuth2 application usage usin
 
     authorization_url = oauth2_handler.authorize_url('email')
 
-You can pass named parameters to `authorize_url`. Some OAuth2.0 providers allow extra parameters for configuring authorization. For example in google api:
+You can pass named parameters to `authorize_url`. Some OAuth2 providers allow extra parameters for configuring authorization. For example in google api:
 
     authorization_url = oauth2_handler.authorize_url('https://www.googleapis.com/auth/books', response_type='code')
 
-Once the user clicks in this `authorization_url`. He will be requested to log in, if he wasn't, and consent access to the application. After granting access, user will be redirected to "http://yoursite.com/webhook?params". `params` are a list of GET params. If everything went right they should at least contain a param named `code`, you will need to parse it and pass it to the connection handler. 
+Once the user clicks in this `authorization_url`. He will be requested to log in, if he wasn't, and consent access to the application. After granting access, user will be redirected to `http://yoursite.com/webhook?params`. `params` are a list of GET params. If everything went right they should at least contain a param named `code`, you will need to parse it and pass it to the connection handler. 
 
 The code will be used to request an access token, necessary for all following requests to the API you do. Sometimes the site for authorization is different to the site for user consent (`token_url`). You can change the site in between doing:
 
