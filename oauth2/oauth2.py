@@ -1,6 +1,10 @@
 import requests 
 from urllib import quote, urlencode
 from urlparse import parse_qs
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 class OAuth2(object):
@@ -38,7 +42,10 @@ class OAuth2(object):
         response = requests.post(url, verify=False, data=data)
 
         if isinstance(response.content, basestring):
-            content = parse_qs(response.content)
+            try:
+                content = json.loads(response.content)
+            except ValueError:
+                content = parse_qs(response.content)
         else:
             content = response.content
        
