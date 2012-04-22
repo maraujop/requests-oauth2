@@ -41,11 +41,11 @@ Response can be a dictionary or `None`, if everything went right it should conta
     oauth2_client = requests.session(params={'access_token': response['access_token']})
     oauth2_client.get('https://graph.facebook.com/me')
 
-Beware that session cannot be passed a kwarg `data`. This is <a href="https://github.com/kennethreitz/requests/issues/468">a bug in requests</a>.
-
 ## Next
 
 From here you can code your own binding for your favorite API the way you like. This will usually imply persisting the access token mapped to some user's information, so you can replicate the session on every request. Also you will have to handle error situations and token expiration, for sure requests will help you tackle this task.
+
+There are also many API bindings available that will start requesting you an access token, but won't do the OAuth2 initialization handling for you, then requests-oauth2 will prove useful.
 
 ## Interesting readings
 
