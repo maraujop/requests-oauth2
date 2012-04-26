@@ -11,7 +11,7 @@ Licence: BSD
 
 Initialize the connection handler. It accepts this parameters. `authorization_url` and `token_url` are optional and have defaults.
 
-    from oauth2 import OAuth2
+    from requests_oauth2 import OAuth2
     OAuth2(client_id, client_secret, site, redirect_uri, [authorization_url='oauth/authorize'], [token_url='oauth/token'])
 
 An example for facebook would be:
