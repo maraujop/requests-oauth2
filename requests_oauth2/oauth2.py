@@ -57,5 +57,5 @@ class OAuth2BearerToken(AuthBase):
         self.access_token = access_token
 
     def __call__(self, r):
-        r.headers['Authorization'] = 'Bearer: {}'.format(self.access_token)
+        r.headers['Authorization'] = 'Bearer {}'.format(self.access_token)
         return r
