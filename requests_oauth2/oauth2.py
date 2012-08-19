@@ -1,4 +1,5 @@
 import requests
+from requests.auth import AuthBase
 from urllib import quote, urlencode
 from urlparse import parse_qs
 try:
@@ -50,3 +51,11 @@ class OAuth2(object):
             content = response.content
 
         return content
+
+class OAuth2BearerToken(AuthBase):
+    def __init__(self, access_token):
+        self.access_token = access_token
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Bearer: {}'.format(self.access_token)
+        return r
