@@ -32,14 +32,19 @@ class OAuth2(object):
         oauth_params.update(kwargs)
         return "%s%s?%s" % (self.site, quote(self.authorization_url), urlencode(oauth_params))
 
-    def get_token(self, code, **kwargs):
+
+    def get_token(self, code, headers=None, **kwargs):
         """
         Requests an access token
         """
         url = "%s%s" % (self.site, quote(self.token_url))
         data = {'redirect_uri': self.redirect_uri, 'client_id': self.client_id, 'client_secret': self.client_secret, 'code': code}
         data.update(kwargs)
-        response = requests.post(url, data=data)
+
+        if headers:
+            response = requests.post(url, data=data, headers=headers)
+        else:
+            response = requests.post(url, data=data)
 
         if isinstance(response.content, basestring):
             try:
