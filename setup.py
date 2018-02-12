@@ -14,7 +14,7 @@ setup(
     author_email='miguel.araujo.perez@gmail.com',
     url='http://github.com/maraujop/requests-oauth2',
     packages=find_packages(),
-    install_requires=['requests', ],
+    install_requires=['requests', 'six'],
     license='BSD',
     classifiers=(
         "Development Status :: 5 - Production/Stable",
