@@ -24,15 +24,11 @@ class OAuth2(object):
         if revoke_url is not None:
             self.revoke_url = revoke_url
 
-    def _make_request(self, url, data, headers=None):
+    def _make_request(self, url, **kwargs):
         """
         Make a request to an OAuth2 endpoint
         """
-        if headers:
-            response = requests.post(url, data=data, headers=headers)
-        else:
-            response = requests.post(url, data=data)
-
+        response = requests.post(url, **kwargs)
         try:
             return response.json()
         except ValueError:
@@ -65,7 +61,7 @@ class OAuth2(object):
         }
         data.update(kwargs)
 
-        return self._make_request(url, data, headers)
+        return self._make_request(url, data=data, headers=headers)
 
     def refresh_token(self, headers=None, **kwargs):
         """
@@ -78,7 +74,7 @@ class OAuth2(object):
         }
         data.update(kwargs)
 
-        return self._make_request(url, data, headers)
+        return self._make_request(url, data=data, headers=headers)
 
     def revoke_token(self, token, headers=None, **kwargs):
         """
@@ -88,4 +84,4 @@ class OAuth2(object):
         data = {'token': token}
         data.update(kwargs)
 
-        return self._make_request(url, data, headers)
+        return self._make_request(url, data=data, headers=headers)
