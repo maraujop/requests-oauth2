@@ -38,7 +38,8 @@ Finally we have to get an access token passing the code we got from the OAuth pr
 
 Response can be a dictionary or `None`, if everything went right it should contain at least an `access_token` key. It will usually contain other interesting parameters such as expiring time. We can now do API calls, all of them should contain the `access_token` as a parameter. Thus we can generate a requests session, to avoid passing the parameter every time.
 
-    oauth2_client = requests.session(params={'access_token': response['access_token']})
+    oauth2_client = requests.Session()
+    oauth2_client.params = {'access_token': response['access_token']}
     oauth2_client.get('https://graph.facebook.com/me')
 
 ## Next
