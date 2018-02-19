@@ -1,6 +1,9 @@
 import requests
-from urllib import quote, urlencode
-from urlparse import parse_qs
+try:
+    from urllib import quote, urlencode
+    from urlparse import parse_qs
+except ImportError:
+   from  urllib.parse import quote, urlencode, parse_qs
 try:
     import simplejson as json
 except ImportError:
