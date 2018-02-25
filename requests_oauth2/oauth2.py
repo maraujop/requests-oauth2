@@ -2,6 +2,8 @@ import requests
 
 from six.moves.urllib.parse import quote, urlencode, parse_qs
 
+from requests_oauth2.errors import ConfigurationError
+
 
 class OAuth2(object):
     authorization_url = '/oauth/authorize'
@@ -24,6 +26,13 @@ class OAuth2(object):
         if revoke_url is not None:
             self.revoke_url = revoke_url
 
+    def _check_configuration(self, *attrs):
+        """Check that each named attr has been configured
+        """
+        for attr in attrs:
+            if getattr(self, attr, None) is None:
+                raise ConfigurationError("{} not configured".format(attr))
+
     def _make_request(self, url, **kwargs):
         """
         Make a request to an OAuth2 endpoint
@@ -39,6 +48,8 @@ class OAuth2(object):
         """
         Returns the url to redirect the user to for user consent
         """
+        self._check_configuration("site", "authorization_url", "redirect_uri",
+                                  "client_id")
         oauth_params = {
             'redirect_uri': self.redirect_uri,
             'client_id': self.client_id,
@@ -52,6 +63,8 @@ class OAuth2(object):
         """
         Requests an access token
         """
+        self._check_configuration("site", "token_url", "redirect_uri",
+                                  "client_id", "client_secret")
         url = "%s%s" % (self.site, quote(self.token_url))
         data = {
             'redirect_uri': self.redirect_uri,
@@ -67,6 +80,8 @@ class OAuth2(object):
         """
         Request a refreshed token
         """
+        self._check_configuration("site", "token_url", "client_id",
+                                  "client_secret")
         url = "%s%s" % (self.site, quote(self.token_url))
         data = {
             'client_id': self.client_id,
@@ -80,6 +95,7 @@ class OAuth2(object):
         """
         Revoke an access token
         """
+        self._check_configuration("site", "revoke_uri")
         url = "%s%s" % (self.site, quote(self.revoke_url))
         data = {'token': token}
         data.update(kwargs)
