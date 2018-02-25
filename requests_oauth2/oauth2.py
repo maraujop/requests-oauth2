@@ -6,21 +6,29 @@ from requests_oauth2.errors import ConfigurationError
 
 
 class OAuth2(object):
+    client_id = None
+    client_secret = None
+    site = None
+    redirect_uri = None
     authorization_url = '/oauth/authorize'
     token_url = '/oauth/token'
     revoke_url = '/oauth2/revoke'
     scope_sep = None
 
-    def __init__(self, client_id, client_secret, site, redirect_uri,
-                 authorization_url=None, token_url=None,
-                 revoke_url=None, scope_sep=None):
+    def __init__(self, client_id=None, client_secret=None, site=None,
+                 redirect_uri=None, authorization_url=None,
+                 token_url=None, revoke_url=None, scope_sep=None):
         """
         Initializes the hook with OAuth2 parameters
         """
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.site = site
-        self.redirect_uri = redirect_uri
+        if client_id is not None:
+            self.client_id = client_id
+        if client_secret is not None:
+            self.client_secret = client_secret
+        if site is not None:
+            self.site = site
+        if redirect_uri is not None:
+            self.redirect_uri = redirect_uri
         if authorization_url is not None:
             self.authorization_url = authorization_url
         if token_url is not None:
