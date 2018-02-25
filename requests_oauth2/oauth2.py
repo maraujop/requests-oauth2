@@ -9,9 +9,11 @@ class OAuth2(object):
     authorization_url = '/oauth/authorize'
     token_url = '/oauth/token'
     revoke_url = '/oauth2/revoke'
+    scope_sep = None
 
     def __init__(self, client_id, client_secret, site, redirect_uri,
-                 authorization_url=None, token_url=None, revoke_url=None):
+                 authorization_url=None, token_url=None,
+                 revoke_url=None, scope_sep=None):
         """
         Initializes the hook with OAuth2 parameters
         """
@@ -25,6 +27,8 @@ class OAuth2(object):
             self.token_url = token_url
         if revoke_url is not None:
             self.revoke_url = revoke_url
+        if scope_sep is not None:
+            self.scope_sep = scope_sep
 
     def _check_configuration(self, *attrs):
         """Check that each named attr has been configured
@@ -50,6 +54,9 @@ class OAuth2(object):
         """
         self._check_configuration("site", "authorization_url", "redirect_uri",
                                   "client_id")
+        if isinstance(scope, (list, tuple, set, frozenset)):
+            self._check_configuration("scope_sep")
+            scope = self.scope_sep.join(scope)
         oauth_params = {
             'redirect_uri': self.redirect_uri,
             'client_id': self.client_id,
