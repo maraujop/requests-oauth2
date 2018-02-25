@@ -1,5 +1,7 @@
 # requests-oauth2
 
+[![PyPI](https://img.shields.io/pypi/v/requests-oauth2.svg)](https://pypi.python.org/pypi/requests-oauth2)
+
 OAuth v2.0 support for
 [kennethreitz](https://github.com/kennethreitz)'s well-known
 [Requests](https://github.com/kennethreitz/requests) library.
