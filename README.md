@@ -1,66 +1,142 @@
 # requests-oauth2
 
-This plugins adds OAuth v2.0 support to <a href="http://github.com/kennethreitz">@kennethreitz</a> well-known <a href="http://github.com/kennethreitz/requests">requests</a> library.
+OAuth v2.0 support for
+[kennethreitz](https://github.com/kennethreitz)'s well-known
+[Requests](https://github.com/kennethreitz/requests) library.
 
-requests-oauth2 wants to provide the simplest and easiest way to do OAuth2 in Python. OAuth2 is several orders of magnitude easier to do than old OAuth1.0, so this is basically a simple connection initialization library. If you are looking for a way of doing OAuth 1.0 see <a href="http://github.com/maraujop/requests-oauth">requests-oauth</a>
+This library wants to provide the simplest and easiest way to do
+OAuth2 in Python. OAuth2 is much easier to do than old OAuth1.0, and
+likewise this library is simple, free of cruft, and practical in
+everyday use. If you are looking for a way of doing OAuth 1.0, see
+[requests-oauth](https://github.com/maraujop/requests-oauth).
 
-Author: <a href="http://github.com/maraujop">Miguel Araujo</a>
-Licence: BSD
+Authors: see [AUTHORS](/AUTHORS).
 
-## Usage with Facebook API
+License: BSD
 
-Initialize the connection handler. It accepts this parameters. `authorization_url` and `token_url` are optional and have defaults.
+Examples: with [Flask](/examples/web_flask.py).
 
-    from requests_oauth2 import OAuth2
-    OAuth2(client_id, client_secret, site, redirect_uri, [authorization_url='oauth/authorize'], [token_url='oauth/token'])
+## OAuth2 web app flow - the theory
 
-An example for facebook would be:
+Skip this if you know how OAuth2 works.
 
-    oauth2_handler = OAuth2(client_id, client_secret, "https://www.facebook.com/", "http://yoursite.com/webhook", "dialog/oauth", "oauth/access_token")
+1. Your web app (*Foo*) allows users to log in with their *Qux*
+   account. *Qux* here is a service provider; they gave you a **client
+   ID** and a **secret key**, which *Foo* stores somewhere on the
+   backend. *Qux* and *Foo* pre-agree on some **redirect URI**.
+2. User visits *Foo*'s login screen, e.g.
+   `https://www.foo.example/login`
+3. *Foo* redirects users to *Qux*'s **Authorization URL**, e.g.
+   `https://api.qux.example/oauth/authorize`
+4. User is presented with *Qux*'s **consent screen**, where they
+   review the **scope** of requested permissions, and either allow or
+   deny access.
+5. Once access is granted, *Qux* redirects back to *Foo* via the
+   **redirect URI** that they both agreed upon beforehand, supplying
+   the **code**.
+6. *Foo* exchanges the **code** for an **access token**. The access
+   token can be used by *Foo* to make API calls to *Qux* on user's
+   behalf.
 
-Get the url to redirect the user to for consenting OAuth2 application usage using `authorize_url`. This method can be passed a `scope`, which defines the permissions your application will have with that user. If not passed, an empty string will be used, which in some providers means default privileges:
+## Usage example
 
-    authorization_url = oauth2_handler.authorize_url('email')
+Look into the [examples directory](/examples) for fully integrated,
+working examples.
 
-You can pass named parameters to `authorize_url`. Some OAuth2 providers allow extra parameters for configuring authorization. For example in google api:
+Some providers are included out of the box, but adding more is quite
+easy. In this example, we'll get started with Google.
 
-    authorization_url = oauth2_handler.authorize_url('https://www.googleapis.com/auth/books', response_type='code')
+You will find **Client ID** & **secret** (point 1 above) in your
+[Google API console](https://console.cloud.google.com/apis/credentials).
 
-Once the user clicks in this `authorization_url`. He will be requested to log in, if he wasn't, and consent access to the application. After granting access, user will be redirected to `http://yoursite.com/webhook?params`. `params` are a list of GET params. If everything went right they should at least contain a param named `code`, you will need to parse it and pass it to the connection handler. 
+You must choose the **redirect URI**, which must be handled by your
+web app.
 
-The code will be used to request an access token, necessary for all following requests to the API you do. Sometimes the site for authorization is different to the site for user consent (`token_url`). You can change the site in between doing:
+```python
+from requests_oauth2.services import GoogleClient
+google_auth = GoogleClient(
+    client_id="your-google-client-id",
+    client_secret="super-secret",
+    redirect_uri="http://localhost:5000/google/oauth2callback",
+)
+```
 
-    oauth2_handler.site = "https://graph.facebook.com/"
+When the user visits the login page (point 2), we'll build an
+**authorization URL** (point 3) that will direct the user to Google's
+**consent screen**, asking to grant the specified **scopes** (point
+4):
 
-Finally we have to get an access token passing the code we got from the OAuth provider, for that we use `get_token`. This method also accepts extra named parameters that you may need:
+```python
+authorization_url = google_auth.authorize_url(
+    scope=["email"],
+    response_type="code",
+)
+```
 
-    response = oauth2_handler.get_token(code)
+Once the user clicks "allow", Google will redirect them to the
+**redirect URI** (point 5), which will include the **code** as one of
+the query string parameters:
 
-Response can be a dictionary or `None`, if everything went right it should contain at least an `access_token` key. It will usually contain other interesting parameters such as expiring time. We can now do API calls, all of them should contain the `access_token` as a parameter. Thus we can generate a requests session, to avoid passing the parameter every time.
+    http://localhost:5000/google/oauth2callback?code=...
 
-    oauth2_client = requests.Session()
-    oauth2_client.params = {'access_token': response['access_token']}
-    oauth2_client.get('https://graph.facebook.com/me')
+The code will be used to request an **access token** (point 6),
+necessary for all following requests to the API:
 
-## Next
+```python
+code = get_request_parameter("code")  # this depends on your web framework!
+data = google_auth.get_token(
+    code=code,
+    grant_type="authorization_code",
+)
+```
 
-From here you can code your own binding for your favorite API the way you like. This will usually imply persisting the access token mapped to some user's information, so you can replicate the session on every request. Also you will have to handle error situations and token expiration, for sure requests will help you tackle this task.
+You can store it somewhere for later use, e.g. in the session, or in
+the database:
 
-There are also many API bindings available that will start requesting you an access token, but won't do the OAuth2 initialization handling for you, then requests-oauth2 will prove useful.
+```python
+session["access_token"] = data["access_token"]
+```
+
+The exact method for supplying the **access token** varies from one
+provider to another. One popular method (supported by Google) is via
+the Bearer header. There's a helper shortcut for this:
+
+```python
+from requests_oauth2 import OAuth2BearerToken
+
+with requests.Session() as s:
+    s.auth = OAuth2BearerToken(access_token)
+    r = s.get("https://www.googleapis.com/plus/v1/people/me")
+    r.raise_for_status()
+    data = r.json()
+```
+
+Other providers, such as Facebook, allow the access token to be passed
+as a request parameter (in the query string). You would so something
+like this:
+
+```python
+from requests_oauth2 import OAuth2BearerToken
+
+with requests.Session() as s:
+    s.params = {"access_token": response["access_token"]}
+    r = s.get("https://graph.facebook.com/me")
+    r.raise_for_status()
+    data = r.json()
+```
 
 ## Interesting readings
 
 * Using OAuth 2.0 to Access Google APIs:
-https://developers.google.com/accounts/docs/OAuth2
+  <https://developers.google.com/accounts/docs/OAuth2>
 
 * Using OAuth 2.0 for Web Server Applications Google APIs:
-https://developers.google.com/accounts/docs/OAuth2WebServer
+  <https://developers.google.com/accounts/docs/OAuth2WebServer>
 
 * OAuth 2.0 in Facebook:
-http://developers.facebook.com/docs/authentication/
+  <http://developers.facebook.com/docs/authentication/>
 
 * Github OAuth 2.0 usage:
-http://develop.github.com/p/oauth.html
+  <https://developer.github.com/apps/building-oauth-apps/>
 
-* You can use postbin for testing webhooks:
-http://www.postbin.org/
+* You can use postbin for testing webhooks: <http://www.postbin.org/>

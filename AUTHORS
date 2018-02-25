@@ -1,9 +1,25 @@
 Requests-oauth2 is written and maintained by
 
-Development Lead
-````````````````
+Original author
+---------------
+
 - Miguel Araujo <maraujop>
+
+Maintainer
+----------
+
+- Kamil Cholewiński <rollcat>
 
 Contributors
 ------------
-- Ignas Mikalajūnas <ignas>
+
+Thanks to the following people:
+
+- Craig Slusher <sleekslush>
+- Glen Zangirolami <glenbot>
+- Ignas Mikalajūnas <Ignas>
+- Owen Barton <grugnog>
+- <Patrykw>
+
+...and anyone else we may have forgotten:
+https://github.com/maraujop/requests-oauth2/graphs/contributors
