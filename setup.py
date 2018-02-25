@@ -5,11 +5,15 @@ from setuptools import setup, find_packages
 
 version = '0.2.0'
 
+with open('README.md') as f:
+    long_description = f.read()
+
+
 setup(
     name='requests-oauth2',
     version=version,
-    description='Open Authentication 2 support to Python-requests HTTP library.',
-    long_description=open('README.md').read(),
+    description='OAuth2 support to Python-Requests HTTP library.',
+    long_description=long_description,
     author='Miguel Araujo',
     author_email='miguel.araujo.perez@gmail.com',
     url='http://github.com/maraujop/requests-oauth2',
@@ -25,6 +29,6 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ),
-    keywords=['requests', 'python-requests', 'OAuth', 'open authentication'],
+    keywords=['requests', 'python-requests', 'OAuth', 'OAuth2'],
     zip_safe=False,
 )
